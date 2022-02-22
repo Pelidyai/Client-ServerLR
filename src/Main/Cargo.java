@@ -11,7 +11,7 @@ public class Cargo extends Car{
     {
         super(WW, WH);
         Random rand = new Random();
-        ImInd = rand.nextInt(8)+7;
+        ImInd = rand.nextInt(7)+8;
     }
     public void move()
     {
