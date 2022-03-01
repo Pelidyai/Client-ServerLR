@@ -9,9 +9,8 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Habitat extends JPanel{
-    public static void main(String[]args)
-    {
+public class Habitat extends JPanel {
+    public static void main(String[] args) {
         JFrame frame = new JFrame();
         Habitat h = new Habitat();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,31 +22,41 @@ public class Habitat extends JPanel{
         h.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                boolean flag = true;
-                for(int i=0; i<h.cars.size(); i++)
-                {
-                    if(h.cars.get(i).isIn(e.getX(), e.getY()))
-                    {
-                        synchronized (h.cars)
-                        {
-                            h.cars.remove(i);
+                switch (e.getButton()){
+                    case 1:{
+                        boolean flag = true;
+                        for (int i = 0; i < h.cars.size(); i++) {
+                            if (h.cars.get(i).isIn(e.getX(), e.getY())) {
+                                synchronized (h.cars) {
+                                    h.cars.remove(i);
+                                }
+                                //System.out.println("tik");
+                                flag = false;
+                            }
                         }
-                        //System.out.println("tik");
-                        flag = false;
+                        if (flag) {
+                            Car car;
+                            Random rand = new Random();
+                            if (rand.nextBoolean())
+                                car = new Cargo(750, 650);
+                            else
+                                car = new PassCar(750, 650);
+                            car.cx = e.getX();
+                            car.cy = e.getY();
+                            synchronized (h.cars) {
+                                h.cars.add(car);
+                            }
+                        }
+                        break;
                     }
-                }
-                if (flag)
-                {
-                    Car car;
-                    Random rand = new Random();
-                    if (rand.nextBoolean())
-                        car = new Cargo(750, 650);
-                    else
-                        car = new PassCar(750, 650);
-                    car.cx = e.getX();
-                    car.cy = e.getY();
-                    synchronized (h.cars) {
-                        h.cars.add(car);
+                    case 3:{
+                        for (int i = 0; i < h.cars.size(); i++) {
+                            if (h.cars.get(i).isIn(e.getX(), e.getY())) {
+                                synchronized (h.cars) {
+                                    h.cars.get(i).isMove = !h.cars.get(i).isMove;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -75,7 +84,7 @@ public class Habitat extends JPanel{
         frame.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if(e.getKeyChar()==' ')
+                if (e.getKeyChar() == ' ')
                     Check.isMove = !Check.isMove;
 
             }
@@ -97,27 +106,27 @@ public class Habitat extends JPanel{
 //        while(true)
 //            frame.repaint();
     }
+
     public ArrayList<Car> cars = new ArrayList<Car>();
     Threads.PaintThread pThread;
     Threads.AIThread aiThread;
     Threads.GenThread genThread;
-    Threads.EmptyThread eThread;
     ImagePanel imPan;
-    public void Init()
-    {
+
+    public void Init() {
         //genThread.setH(this);
-       // genThread.start();
+        // genThread.start();
         pThread.setH(this);
         pThread.start();
         aiThread.setH(this);
         aiThread.start();
     }
-    public Habitat()
-    {
+
+    public Habitat() {
         pThread = new Threads.PaintThread();
         aiThread = new Threads.AIThread();
-       // genThread = new Threads.GenThread(750, 650);
-        eThread = new Threads.EmptyThread();
+        // genThread = new Threads.GenThread(750, 650);
+        //eThread = new Threads.EmptyThread();
         imPan = new ImagePanel(cars);
         this.setLayout(new BorderLayout());
         this.add(imPan, BorderLayout.CENTER);

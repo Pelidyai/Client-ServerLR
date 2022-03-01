@@ -8,6 +8,7 @@ public abstract class Car {
     int h = 74, w = 100;
     int ImInd;
     Color color;
+    boolean isMove = true;
 
     private static boolean isInit =false;
     static Image[] Im = new Image[16];

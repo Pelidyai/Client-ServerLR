@@ -9,48 +9,25 @@ import java.util.Random;
  * Created by User on 26.03.2021.
  */
 public class Threads {
-    public static Object sync = new Object();
-
-    public static class EmptyThread extends Thread {
-        @Override
-        public void run() {
-            while (!Check.isExit) {
-                Empty();
-            }
-        }
-
-        private synchronized void Empty() {
-            while (Check.isWork) {
-                synchronized (sync) {
-                    if (Check.isMove) {
-                        try {
-                            sync.notify();
-                            sync.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     public static class PaintThread extends Thread {
         Habitat h;
+
         PaintThread() {
             super("Paint Thread");
 
         }
-        public void setH(Habitat hab)
-        {
-            h=hab;
+
+        public void setH(Habitat hab) {
+            h = hab;
         }
+
         @Override
         public void run() {
             while (!Check.isExit)
                 while (Check.isWork) {
                     h.repaint();
-                   // System.out.println("Print");
+                    // System.out.println("Print");
                     try {
                         sleep(1);
                     } catch (InterruptedException e) {
@@ -62,13 +39,15 @@ public class Threads {
 
     public static class AIThread extends Thread {
         Habitat h;
+
         AIThread() {
             super("GenThread");
         }
-        public void setH(Habitat hab)
-        {
-            h=hab;
+
+        public void setH(Habitat hab) {
+            h = hab;
         }
+
         @Override
         public void run() {
             while (Check.isWork) {
@@ -86,18 +65,20 @@ public class Threads {
     }
 
     public static class GenThread extends Thread {
-        GenThread( int WW, int WH) {
+        GenThread(int WW, int WH) {
             super("GenThread");
             last = LocalTime.now().toSecondOfDay();
             rv = new Dimension(WW, WH);
         }
+
         Dimension rv;
         Habitat h;
         public static long last;
-        public void setH(Habitat hab)
-        {
-            h=hab;
+
+        public void setH(Habitat hab) {
+            h = hab;
         }
+
         @Override
         public void run() {
             while (!Check.isExit) {
