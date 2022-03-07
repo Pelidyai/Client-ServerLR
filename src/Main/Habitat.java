@@ -6,6 +6,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,8 +25,8 @@ public class Habitat extends JPanel {
         h.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                switch (e.getButton()){
-                    case 1:{
+                switch (e.getButton()) {
+                    case 1: {
                         boolean flag = true;
                         for (int i = 0; i < h.cars.size(); i++) {
                             if (h.cars.get(i).isIn(e.getX(), e.getY())) {
@@ -49,7 +52,7 @@ public class Habitat extends JPanel {
                         }
                         break;
                     }
-                    case 3:{
+                    case 3: {
                         for (int i = 0; i < h.cars.size(); i++) {
                             if (h.cars.get(i).isIn(e.getX(), e.getY())) {
                                 synchronized (h.cars) {
@@ -57,6 +60,7 @@ public class Habitat extends JPanel {
                                 }
                             }
                         }
+                        break;
                     }
                 }
             }
@@ -84,8 +88,20 @@ public class Habitat extends JPanel {
         frame.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == ' ')
-                    Check.isMove = !Check.isMove;
+                switch (e.getKeyChar()) {
+                    case ' ': {
+                        Check.isMove = !Check.isMove;
+                        break;
+                    }
+                    case 't': {
+                        h.SaveText("Cars.txt");
+                        break;
+                    }
+                    case 'r': {
+                        h.LoadText("Cars.txt");
+                        break;
+                    }
+                }
 
             }
 
@@ -135,5 +151,43 @@ public class Habitat extends JPanel {
     @Override
     public synchronized void paintComponent(Graphics g) {
         super.paintComponent(g);
+    }
+
+    public void SaveText(String filename) {
+        try {
+            FileWriter f = new FileWriter(filename);
+            f.write(String.valueOf(cars.size()) + '\n');
+            for (Car car : cars) {
+                car.saveText(f);
+            }
+            f.close();
+            System.out.println("save");
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    public void LoadText(String filename) {
+        try {
+            FileReader f = new FileReader(filename);
+            cars.clear();
+            int count = FileActions.readInt(f);
+            for (int i = 0; i < count; i++) {
+                String name = FileActions.readStr(f);
+                Car c;
+                try {
+                    Class<?> t = Class.forName("Main." + name);
+                    c = (Car) t.newInstance();
+                    c.loadText(f);
+                    cars.add(c);
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
+                }
+            }
+            f.close();
+            System.out.println("load");
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 }
