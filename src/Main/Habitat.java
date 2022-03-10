@@ -1,16 +1,18 @@
 package Main;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.jar.JarOutputStream;
 
 public class Habitat extends JPanel {
     public static void main(String[] args) {
@@ -101,6 +103,29 @@ public class Habitat extends JPanel {
                         h.LoadText("Cars.txt");
                         break;
                     }
+                    case 'b': {
+                        h.saveBin("BinCars.txt");
+                        break;
+                    }
+                    case 'v': {
+                        h.loadBin("BinCars.txt");
+                        break;
+                    }
+//                    case 'j':{
+//                        try {
+//                            FileOutputStream f = new FileOutputStream("tets.txt");
+//                            int val = 65152;
+//                            byte[] b= BinFileAction.IntToBytes(val);
+//                            for(byte by:b)
+//                                System.out.println(by);
+//                            val = BinFileAction.ByteToInt(b);
+//                            System.out.println(val);
+//
+//                        } catch (FileNotFoundException fileNotFoundException) {
+//                            fileNotFoundException.printStackTrace();
+//                        }
+//                        break;
+//                    }
                 }
 
             }
@@ -186,6 +211,68 @@ public class Habitat extends JPanel {
             }
             f.close();
             System.out.println("load");
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    public void saveBin(String filename)
+    {
+        try {
+            FileOutputStream f = new FileOutputStream(filename);
+            f.write(BinFileAction.IntToBytes(cars.size()));
+            for (Car car : cars) {
+                car.saveBin(f);
+            }
+            f.close();
+            System.out.println("Bin saved");
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    public void loadBin(String filename) {
+        try {
+            FileInputStream f = new FileInputStream(filename);
+            cars.clear();
+            byte[] b = new byte[f.available()];
+            byte[] buf = new byte[90];
+            f.read(b);
+            int i=0;
+            int IntNum = 8;
+            int CrB = 89;
+            int PsB = 65;
+
+            for(int j=0; j<IntNum; j++, i++)
+                buf[j] = b[i];
+            int count = BinFileAction.ByteToInt(buf);
+            for (int k = 0; k < count; k++) {
+                int j=0;
+                StringBuilder sb = new StringBuilder();
+                while(true){
+                    if((char)b[i]=='\n')
+                        break;
+                    sb.append((char)b[i]);
+                    i++;
+                }
+                i++;
+                String name = sb.toString();
+                Car c;
+                int numB = PsB;
+                try {
+                    Class<?> t = Class.forName("Main." + name);
+                    c = (Car) t.newInstance();
+                    if (name.equals("Cargo")) numB = CrB;
+                    for(j=0; j<numB; j++, i++)
+                        buf[j] = b[i];
+                    c.loadBin(buf);
+                    cars.add(c);
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
+                }
+            }
+            f.close();
+            System.out.println("Bin loaded");
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

@@ -1,9 +1,7 @@
 package Main;
 
 import java.awt.*;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 
 public abstract class Car {
@@ -84,5 +82,20 @@ public abstract class Car {
         isMove = FileActions.readBool(f);
         color = FileActions.readColor(f);
     }
-    //  abstract public void saveBin(FileWriter f);
+
+    public void saveBin(FileOutputStream f) {
+        try {
+            f.write(BinFileAction.IntToBytes(cx));
+            f.write(BinFileAction.IntToBytes(cy));
+            f.write(BinFileAction.IntToBytes(w));
+            f.write(BinFileAction.IntToBytes(h));
+            f.write(BinFileAction.IntToBytes(ImInd));
+            f.write(BinFileAction.BoolToByte(isMove));
+            f.write(BinFileAction.ColorToBytes(color));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    abstract public void loadBin(byte[] b);
 }

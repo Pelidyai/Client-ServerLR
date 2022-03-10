@@ -1,5 +1,6 @@
 package Main;
 
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
@@ -30,5 +31,48 @@ public class PassCar extends Car {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void saveBin(FileOutputStream f) {
+        try {
+            f.write(("PassCar" + '\n').getBytes());
+            super.saveBin(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void loadBin(byte[] b) {
+        byte[] buf = new byte[24];
+        int i = 0;
+        int intNum = 8;
+        for (int j = 0; j < intNum; j++, i++)
+            buf[j] = b[i];
+        cx = BinFileAction.ByteToInt(buf);
+
+        for (int j = 0; j < intNum; j++, i++)
+            buf[j] = b[i];
+        cy = BinFileAction.ByteToInt(buf);
+
+        for (int j = 0; j < intNum; j++, i++)
+            buf[j] = b[i];
+        w = BinFileAction.ByteToInt(buf);
+
+        for (int j = 0; j < intNum; j++, i++)
+            buf[j] = b[i];
+        h = BinFileAction.ByteToInt(buf);
+
+        for (int j = 0; j < intNum; j++, i++)
+            buf[j] = b[i];
+        ImInd = BinFileAction.ByteToInt(buf);
+
+        isMove = BinFileAction.ByteToBool(b[i]);
+        i++;
+
+        for (int j = 0; j < intNum * 3; j++, i++)
+            buf[j] = b[i];
+        color = BinFileAction.ByteToColor(buf);
     }
 }
