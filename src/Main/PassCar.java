@@ -1,8 +1,6 @@
 package Main;
 
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 
 public class PassCar extends Car {
@@ -74,5 +72,33 @@ public class PassCar extends Car {
         for (int j = 0; j < intNum * 3; j++, i++)
             buf[j] = b[i];
         color = BinFileAction.ByteToColor(buf);
+    }
+
+    @Override
+    void Serialize(ObjectOutputStream f)
+    {
+        try {
+            f.writeUTF("PassCar");
+            super.Serialize(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    void Deserialize(ObjectInputStream f)
+    {
+        try {
+            PassCar base = (PassCar) f.readObject();
+            this.cx = base.cx;
+            this.cy = base.cy;
+            this.w = base.w;
+            this.h = base.h;
+            this.ImInd = base.ImInd;
+            this.isMove = base.isMove;
+            this.color = base.color;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

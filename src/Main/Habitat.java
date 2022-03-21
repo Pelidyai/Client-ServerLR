@@ -8,6 +8,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -111,6 +113,22 @@ public class Habitat extends JPanel {
                         h.loadBin("BinCars.txt");
                         break;
                     }
+                    case 's': {
+                        h.Serialize("SerCar.dat");
+                        break;
+                    }
+                    case 'a': {
+                        h.Deserialize("SerCar.dat");
+                        break;
+                    }
+                    case 'x': {
+                        h.SaveXML("XMLCars.xml");
+                        break;
+                    }
+                    case 'z': {
+                        h.LoadXML("XMLCars.xml");
+                        break;
+                    }
 //                    case 'j':{
 //                        try {
 //                            FileOutputStream f = new FileOutputStream("tets.txt");
@@ -190,6 +208,7 @@ public class Habitat extends JPanel {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
+        System.out.println("Text file saved.");
     }
 
     public void LoadText(String filename) {
@@ -214,10 +233,10 @@ public class Habitat extends JPanel {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
+        System.out.println("Text file loaded.");
     }
 
-    public void saveBin(String filename)
-    {
+    public void saveBin(String filename){
         try {
             FileOutputStream f = new FileOutputStream(filename);
             f.write(BinFileAction.IntToBytes(cars.size()));
@@ -229,6 +248,7 @@ public class Habitat extends JPanel {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
+        System.out.println("Binary file saved.");
     }
 
     public void loadBin(String filename) {
@@ -276,5 +296,89 @@ public class Habitat extends JPanel {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
+        System.out.println("Binary file loaded.");
+    }
+
+    public void Serialize(String file){
+        try {
+            OutputStream fstream = new FileOutputStream(file);
+            ObjectOutputStream f = new ObjectOutputStream(fstream);
+            int i=0;
+            f.write(cars.size());
+            while (i<this.cars.size()) {
+                cars.get(i).Serialize(f);
+                i++;
+            }
+            f.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Serialized.");
+    }
+
+    public void Deserialize(String file){
+        cars.clear();
+        try {
+            InputStream fstream = new FileInputStream(file);
+            ObjectInputStream f = new ObjectInputStream(fstream);
+            int n = f.read();
+            int i=0;
+            while (i<n) {
+                String name = f.readUTF();
+                Car c;
+                try {
+                    Class<?> t = Class.forName("Main." + name);
+                    if (name.equals("Cargo"))
+                        c = (Cargo) t.newInstance();
+                    else
+                        c = (PassCar) t.newInstance();
+                    c.Deserialize(f);
+                    cars.add(c);
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
+                }
+                i++;
+            }
+            f.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Deserialized.");
+    }
+
+    public void SaveXML(String file){
+        try {
+            XMLEncoder f = new XMLEncoder(new FileOutputStream(file));
+            f.writeObject(cars.size());
+            int i=0;
+            while(i<cars.size())
+            {
+                f.writeObject(cars.get(i));
+                i++;
+            }
+            f.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("XML file saved.");
+    }
+
+    public void LoadXML(String file){
+        try {
+            XMLDecoder f = new XMLDecoder(new FileInputStream(file));
+            Car.InitImages();
+            int n = (int) f.readObject();
+            int i=0;
+            cars.clear();
+            while(i<n)
+            {
+                cars.add((Car)f.readObject());
+                i++;
+            }
+            f.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("XML file loaded.");
     }
 }

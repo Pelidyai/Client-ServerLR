@@ -27,7 +27,7 @@ public class Threads {
             while (!Check.isExit)
                 while (Check.isWork) {
                     h.repaint();
-                    // System.out.println("Print");
+                    //System.out.println("Print");
                     try {
                         sleep(1);
                     } catch (InterruptedException e) {

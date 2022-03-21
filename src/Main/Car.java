@@ -4,12 +4,67 @@ import java.awt.*;
 import java.io.*;
 import java.util.Random;
 
-public abstract class Car {
+public abstract class Car implements Serializable {
     int cx, cy;
     int h = 74, w = 100;
     int ImInd;
     Color color;
     boolean isMove = true;
+
+    public void setCx(int cx) {
+        this.cx = cx;
+    }
+    public int getCx() {
+        return cx;
+    }
+    public void setCy(int cy) {
+        this.cy = cy;
+    }
+    public int getCy() {
+        return cy;
+    }
+    public void setColor(Color color) {
+        this.color = color;
+    }
+    public Color getColor() {
+        return color;
+    }
+    public void setH(int h) {
+        this.h = h;
+    }
+    public int getH() {
+        return h;
+    }
+    public void setImInd(int ImInd1) {
+        ImInd = ImInd1;
+    }
+    public int getImInd() {
+        return ImInd;
+    }
+    public void setMove(boolean isMove1) {
+        isMove = isMove1;
+    }
+    public boolean getMove(){
+        return isMove;
+    }
+    public void setW(int w) {
+        this.w = w;
+    }
+    public int getW() {
+        return w;
+    }
+    public static Image[] getIm() {
+        return Im;
+    }
+    public static void setIm(Image[] im) {
+        Im = im;
+    }
+    public static String[] getImName() {
+        return ImName;
+    }
+    public static void setImName(String[] imName) {
+        ImName = imName;
+    }
 
     private static boolean isInit = false;
     static Image[] Im = new Image[16];
@@ -34,7 +89,7 @@ public abstract class Car {
         InitImages();
     }
 
-    private void InitImages() {
+    public static void InitImages() {
         if (!isInit) {
             Toolkit tool = Toolkit.getDefaultToolkit();
             for (int i = 0; i < 15; i++) {
@@ -98,4 +153,15 @@ public abstract class Car {
     }
 
     abstract public void loadBin(byte[] b);
+
+    void Serialize(ObjectOutputStream f)
+    {
+        try {
+            f.writeObject(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    abstract void Deserialize(ObjectInputStream f);
 }

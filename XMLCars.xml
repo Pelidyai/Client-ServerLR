@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_282" class="java.beans.XMLDecoder">
+ <int>4</int>
+ <object class="Main.PassCar">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>96</int>
+    <int>219</int>
+    <int>18</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>78</int>
+  </void>
+  <void property="cy">
+   <int>82</int>
+  </void>
+  <void property="imInd">
+   <int>4</int>
+  </void>
+  <void property="move">
+   <boolean>false</boolean>
+  </void>
+ </object>
+ <object class="Main.Cargo">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>38</int>
+    <int>64</int>
+    <int>152</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>171</int>
+  </void>
+  <void property="cy">
+   <int>455</int>
+  </void>
+  <void property="h">
+   <int>2</int>
+  </void>
+  <void property="imInd">
+   <int>8</int>
+  </void>
+  <void property="t">
+   <double>29.58000000000206</double>
+  </void>
+  <void property="w">
+   <int>3</int>
+  </void>
+ </object>
+ <object class="Main.Cargo">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>209</int>
+    <int>174</int>
+    <int>131</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>542</int>
+  </void>
+  <void property="cy">
+   <int>450</int>
+  </void>
+  <void property="h">
+   <int>103</int>
+  </void>
+  <void property="imInd">
+   <int>9</int>
+  </void>
+  <void property="t">
+   <double>21.580000000000638</double>
+  </void>
+  <void property="w">
+   <int>139</int>
+  </void>
+ </object>
+ <object class="Main.Cargo">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>208</int>
+    <int>226</int>
+    <int>97</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>540</int>
+  </void>
+  <void property="cy">
+   <int>190</int>
+  </void>
+  <void property="h">
+   <int>137</int>
+  </void>
+  <void property="imInd">
+   <int>13</int>
+  </void>
+  <void property="t">
+   <double>14.669999999999732</double>
+  </void>
+  <void property="w">
+   <int>186</int>
+  </void>
+ </object>
+</java>

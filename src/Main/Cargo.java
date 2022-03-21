@@ -19,6 +19,25 @@ public class Cargo extends Car {
         ImInd = rand.nextInt(7) + 8;
     }
 
+    public void setWW(int w) {
+        W = w;
+    }
+    public int getWW() {
+        return W;
+    }
+    public void setHH(int h) {
+        H = h;
+    }
+    public int getHH() {
+        return H;
+    }
+    public void setT(double t) {
+        this.t = t;
+    }
+    public double getT() {
+        return t;
+    }
+
     @Override
     public void move() {
         if (isMove) {
@@ -105,5 +124,35 @@ public class Cargo extends Car {
         for (int j = 0; j < intNum; j++, i++)
             buf[j] = b[i];
         H = BinFileAction.ByteToInt(buf);
+    }
+
+    @Override
+    void Serialize(ObjectOutputStream f) {
+        try {
+            f.writeUTF("Cargo");
+            super.Serialize(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    void Deserialize(ObjectInputStream f) {
+        try {
+            Cargo base = (Cargo) f.readObject();
+            this.cx = base.cx;
+            this.cy = base.cy;
+            this.w = base.w;
+            this.h = base.h;
+            this.ImInd = base.ImInd;
+            this.isMove = base.isMove;
+            this.color = base.color;
+
+            this.W = base.W;
+            this.H = base.H;
+            this.t = base.t;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
