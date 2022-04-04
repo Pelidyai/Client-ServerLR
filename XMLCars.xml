@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <java version="1.8.0_282" class="java.beans.XMLDecoder">
- <int>4</int>
+ <int>6</int>
  <object class="Main.PassCar">
   <void property="color">
    <object class="java.awt.Color">
@@ -39,16 +39,16 @@
    <int>455</int>
   </void>
   <void property="h">
-   <int>2</int>
+   <int>125</int>
   </void>
   <void property="imInd">
    <int>8</int>
   </void>
   <void property="t">
-   <double>29.58000000000206</double>
+   <double>44.7599999999999</double>
   </void>
   <void property="w">
-   <int>3</int>
+   <int>170</int>
   </void>
  </object>
  <object class="Main.Cargo">
@@ -67,16 +67,16 @@
    <int>450</int>
   </void>
   <void property="h">
-   <int>103</int>
+   <int>14</int>
   </void>
   <void property="imInd">
    <int>9</int>
   </void>
   <void property="t">
-   <double>21.580000000000638</double>
+   <double>36.76000000000132</double>
   </void>
   <void property="w">
-   <int>139</int>
+   <int>19</int>
   </void>
  </object>
  <object class="Main.Cargo">
@@ -95,16 +95,63 @@
    <int>190</int>
   </void>
   <void property="h">
-   <int>137</int>
+   <int>0</int>
   </void>
   <void property="imInd">
    <int>13</int>
   </void>
   <void property="t">
-   <double>14.669999999999732</double>
+   <double>29.860000000001868</double>
   </void>
   <void property="w">
-   <int>186</int>
+   <int>0</int>
+  </void>
+ </object>
+ <object class="Main.PassCar">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>109</int>
+    <int>218</int>
+    <int>117</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>-99</int>
+  </void>
+  <void property="imInd">
+   <int>5</int>
+  </void>
+ </object>
+ <object class="Main.Cargo">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>36</int>
+    <int>171</int>
+    <int>183</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>265</int>
+  </void>
+  <void property="cy">
+   <int>312</int>
+  </void>
+  <void property="h">
+   <int>136</int>
+  </void>
+  <void property="imInd">
+   <int>10</int>
+  </void>
+  <void property="move">
+   <boolean>false</boolean>
+  </void>
+  <void property="t">
+   <double>1.0000000000000007</double>
+  </void>
+  <void property="w">
+   <int>184</int>
   </void>
  </object>
 </java>

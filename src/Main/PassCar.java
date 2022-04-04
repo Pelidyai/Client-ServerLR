@@ -86,7 +86,7 @@ public class PassCar extends Car {
     }
 
     @Override
-    void Deserialize(ObjectInputStream f)
+    public void Deserialize(ObjectInputStream f)
     {
         try {
             PassCar base = (PassCar) f.readObject();

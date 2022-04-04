@@ -163,5 +163,5 @@ public abstract class Car implements Serializable {
         }
     }
 
-    abstract void Deserialize(ObjectInputStream f);
+    public abstract void Deserialize(ObjectInputStream f);
 }

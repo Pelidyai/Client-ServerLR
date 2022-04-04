@@ -1,7 +1,5 @@
 package Main;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -11,10 +9,8 @@ import java.awt.event.MouseListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.jar.JarOutputStream;
 
 public class Habitat extends JPanel {
     public static void main(String[] args) {
@@ -129,6 +125,34 @@ public class Habitat extends JPanel {
                         h.LoadXML("XMLCars.xml");
                         break;
                     }
+                    case 'p':
+                    {
+                        SocketClient.start();
+                        break;
+                    }
+                    case 'o':
+                    {
+                        SocketClient.stop();
+                        break;
+                    }
+                    case 'i':
+                    {
+                        SocketClient.clearVec();
+                        break;
+                    }
+                    case 'u':
+                    {
+                        System.out.println("Received size: " + SocketClient.getVecSize() + ".");
+                        break;
+                    }
+                    case 'y':{
+                        SocketClient.addToServer(h.cars, -2);
+                        break;
+                    }
+                    case '\'':{
+                        SocketClient.addToServer(h.cars, 0);
+                        break;
+                    }
 //                    case 'j':{
 //                        try {
 //                            FileOutputStream f = new FileOutputStream("tets.txt");
@@ -166,7 +190,7 @@ public class Habitat extends JPanel {
 //            frame.repaint();
     }
 
-    public ArrayList<Car> cars = new ArrayList<Car>();
+    public ArrayList<Car> cars = new ArrayList<>();
     Threads.PaintThread pThread;
     Threads.AIThread aiThread;
     Threads.GenThread genThread;

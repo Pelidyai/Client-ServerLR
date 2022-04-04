@@ -137,7 +137,7 @@ public class Cargo extends Car {
     }
 
     @Override
-    void Deserialize(ObjectInputStream f) {
+    public void Deserialize(ObjectInputStream f) {
         try {
             Cargo base = (Cargo) f.readObject();
             this.cx = base.cx;
