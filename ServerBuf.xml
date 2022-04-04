@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_282" class="java.beans.XMLDecoder">
+ <int>1</int>
+ <object class="Main.PassCar">
+  <void property="color">
+   <object class="java.awt.Color">
+    <int>116</int>
+    <int>144</int>
+    <int>77</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void property="cx">
+   <int>459</int>
+  </void>
+  <void property="cy">
+   <int>329</int>
+  </void>
+  <void property="imInd">
+   <int>1</int>
+  </void>
+ </object>
+</java>

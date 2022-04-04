@@ -16,6 +16,7 @@ public class ImagePanel extends JPanel {
     @Override
     public synchronized void paint(Graphics g) {
         super.paint(g);
+        //System.out.println("here "+cars.size());
         for (int i = 0; i < cars.size(); i++) {
             cars.get(i).paint((Graphics2D) g);
             //System.out.print(car.cx + " " + car.cy + " ");

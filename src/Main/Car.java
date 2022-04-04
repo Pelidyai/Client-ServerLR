@@ -66,7 +66,7 @@ public abstract class Car implements Serializable {
         ImName = imName;
     }
 
-    private static boolean isInit = false;
+    public static boolean isInit = false;
     static Image[] Im = new Image[16];
     public static String[] ImName = new String[]{"Images/1.png", "Images/2.png",
             "Images/3.png", "Images/4.png",

@@ -20,9 +20,10 @@ public class SocketClient {
             try {
                 os = new DataOutputStream(clientSocket.getOutputStream());
                 os.writeBytes("start\n");
-
+                os.flush();
                 is = clientSocket.getInputStream();
                 br = new BufferedReader(new InputStreamReader(is));
+                //f = new ObjectOutputStream(new BufferedOutputStream(os));
 //                String receivedData = br.readLine();
 //                System.out.println("Received Data: " + receivedData);
             } catch (Exception e) {
@@ -39,6 +40,7 @@ public class SocketClient {
             System.out.println(2);
             try {
                 os.writeBytes("stop\n");
+                os.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -52,6 +54,7 @@ public class SocketClient {
         if (clientSocket != null) {
             try {
                 os.writeBytes("clear\n");
+                os.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -60,10 +63,11 @@ public class SocketClient {
         }
     }
 
-    public static int getVecSize(){
+    public static int getVecSize() {
         if (clientSocket != null) {
             try {
                 os.writeBytes("size\n");
+                os.flush();
                 int size = br.read();
                 return size;
             } catch (Exception e) {
@@ -75,21 +79,21 @@ public class SocketClient {
         return -1;
     }
 
-    public static void addToServer(ArrayList<Car> cars, int index)
-    {
+    public static void addToServer(ArrayList<Car> cars, int index) {
         if (clientSocket != null) {
             try {
-                if(index == -2){
+                ObjectOutputStream f = new ObjectOutputStream(new BufferedOutputStream(os));
+                if (index == -2) {
                     os.writeBytes("add\n");
-                    ObjectOutputStream f = new ObjectOutputStream(os);
-                    f.flush();
+                    os.flush();
                     f.writeObject(cars);
-                }
-                else{
-                    if(0<=index && index<cars.size()) {
+                    f.flush();
+                } else {
+                    if (0 <= index && index < cars.size()) {
                         os.writeBytes("addOne\n");
-                        ObjectOutputStream f = new ObjectOutputStream(os);
+                        os.flush();
                         cars.get(index).Serialize(f);
+                        f.flush();
                     }
                 }
             } catch (Exception e) {
@@ -98,5 +102,41 @@ public class SocketClient {
         } else {
             System.out.println("This client hasn't connection.");
         }
+    }
+
+    public static ArrayList<Car> getVecFromServer() {
+        ArrayList<Car> cars = null;
+        if (clientSocket != null) {
+            try {
+                os.writeBytes("getVec" + '\n');
+                os.flush();
+                ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(is));
+                cars = (ArrayList<Car>) f.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("This client hasn't connection.");
+        }
+        return cars;
+    }
+
+    public static Car getOneFromServer(int index) {
+        Car car = null;
+        if (clientSocket != null) {
+            try {
+                os.writeBytes("getOne" + '\n');
+                os.write(index);
+                os.flush();
+                ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(is));
+                car = (Car) f.readObject();
+                System.out.println("Object received.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("This client hasn't connection.");
+        }
+        return car;
     }
 }

@@ -27,9 +27,9 @@ public class Threads {
             while (!Check.isExit)
                 while (Check.isWork) {
                     h.repaint();
-                    //System.out.println("Print");
+                    //System.out.println("Print" +Car.getIm()[0]);
                     try {
-                        sleep(1);
+                        sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

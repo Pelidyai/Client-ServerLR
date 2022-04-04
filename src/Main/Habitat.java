@@ -150,24 +150,28 @@ public class Habitat extends JPanel {
                         break;
                     }
                     case '\'':{
-                        SocketClient.addToServer(h.cars, 0);
+                        Random rand = new Random();
+                        SocketClient.addToServer(h.cars, rand.nextInt()%h.cars.size());
                         break;
                     }
-//                    case 'j':{
-//                        try {
-//                            FileOutputStream f = new FileOutputStream("tets.txt");
-//                            int val = 65152;
-//                            byte[] b= BinFileAction.IntToBytes(val);
-//                            for(byte by:b)
-//                                System.out.println(by);
-//                            val = BinFileAction.ByteToInt(b);
-//                            System.out.println(val);
-//
-//                        } catch (FileNotFoundException fileNotFoundException) {
-//                            fileNotFoundException.printStackTrace();
-//                        }
-//                        break;
-//                    }
+                    case ';':{
+                        System.out.println(h.cars.size());
+                        ArrayList<Car> buf = SocketClient.getVecFromServer();
+                        h.cars.clear();
+                        h.cars.addAll(0, buf);
+                        Car.Im = new Image[16];
+                        Car.isInit = false;
+                        Car.InitImages();
+                        System.out.println("Vector loaded.");
+                        break;
+                    }
+                    case 'l': {
+                        Random rand = new Random();
+                        Car buf = SocketClient.getOneFromServer(rand.nextInt() % 2);
+                        if (buf != null)
+                            h.cars.add(buf);
+                    }
+
                 }
 
             }

@@ -31,7 +31,6 @@ public class SocketServer {
                 InputStream serverInput = clientConn.getInputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(serverInput));
 
-
                 DataOutputStream serverOutput = new DataOutputStream(clientConn.getOutputStream());
 
                 while (!clientConn.isClosed()) {
@@ -57,12 +56,14 @@ public class SocketServer {
                         case "size": {
                             System.out.println("return size: " + cars.size() + ".");
                             serverOutput.writeInt(cars.size());
+                            serverOutput.flush();
                             break;
                         }
                         case "add": {
                             System.out.println("Add vector.");
                             System.out.println("Vector size before operation: " + cars.size() + ".");
-                            ObjectInputStream f = new ObjectInputStream(serverInput);
+                            ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(serverInput));
+
                             try {
                                 try {
                                     cars = (ArrayList<Car>) f.readObject();
@@ -76,9 +77,10 @@ public class SocketServer {
                             break;
                         }
                         case "addOne": {
-                            ObjectInputStream f = new ObjectInputStream(serverInput);
                             System.out.println("Add One to vector.");
                             System.out.println("Vector size before operation: " + cars.size() + ".");
+                            ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(serverInput));
+
                             try {
                                 String name = f.readUTF();
                                 Car c;
@@ -99,8 +101,32 @@ public class SocketServer {
                             System.out.println("Vector size after operation: " + cars.size() + ".");
                             break;
                         }
+                        case "getVec": {
+                            try {
+                                System.out.println("Send Vector.");
+                                ObjectOutputStream f = new ObjectOutputStream(new BufferedOutputStream(serverOutput));
+                                f.writeObject(cars);
+                                f.flush();
+                                System.out.println("OK.");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        }
+                        case "getOne": {
+                            int index = br.read();
+                            ObjectOutputStream f = new ObjectOutputStream(new BufferedOutputStream(serverOutput));
+                            if (index < 0 || index > cars.size() - 1) {
+                                f.writeObject(null);
+                            } else {
+                                f.writeObject(cars.get(index));
+                            }
+                            f.flush();
+                            System.out.println("Object send.");
+                            break;
+                        }
                         default:
-                            throw new IllegalStateException("Unexpected value: " + command);
+                            break;
                     }
 
                 }
