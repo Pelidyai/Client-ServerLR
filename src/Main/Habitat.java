@@ -21,6 +21,7 @@ public class Habitat extends JPanel {
 
         h.setVisible(true);
 
+        Client.start();
         h.Init();
         h.addMouseListener(new MouseListener() {
             @Override
@@ -125,38 +126,28 @@ public class Habitat extends JPanel {
                         h.LoadXML("XMLCars.xml");
                         break;
                     }
-                    case 'p':
-                    {
-                        SocketClient.start();
-                        break;
-                    }
-                    case 'o':
-                    {
-                        SocketClient.stop();
-                        break;
-                    }
                     case 'i':
                     {
-                        SocketClient.clearVec();
+                        Client.clearVec();
                         break;
                     }
                     case 'u':
                     {
-                        System.out.println("Received size: " + SocketClient.getVecSize() + ".");
+                        System.out.println("Received size: " + Client.getVecSize() + ".");
                         break;
                     }
                     case 'y':{
-                        SocketClient.addToServer(h.cars, -2);
+                        Client.addToServer(h.cars, -2);
                         break;
                     }
                     case '\'':{
                         Random rand = new Random();
-                        SocketClient.addToServer(h.cars, rand.nextInt()%h.cars.size());
+                        Client.addToServer(h.cars, rand.nextInt()%h.cars.size());
                         break;
                     }
                     case ';':{
                         System.out.println(h.cars.size());
-                        ArrayList<Car> buf = SocketClient.getVecFromServer();
+                        ArrayList<Car> buf = Client.getVecFromServer();
                         h.cars.clear();
                         h.cars.addAll(0, buf);
                         Car.Im = new Image[16];
@@ -167,7 +158,7 @@ public class Habitat extends JPanel {
                     }
                     case 'l': {
                         Random rand = new Random();
-                        Car buf = SocketClient.getOneFromServer(rand.nextInt() % 2);
+                        Car buf = Client.getOneFromServer(rand.nextInt() % 2);
                         if (buf != null)
                             h.cars.add(buf);
                     }
@@ -376,7 +367,8 @@ public class Habitat extends JPanel {
 
     public void SaveXML(String file){
         try {
-            XMLEncoder f = new XMLEncoder(new FileOutputStream(file));
+            ByteArrayOutputStream bytestr = new ByteArrayOutputStream();
+            XMLEncoder f = new XMLEncoder(bytestr);
             f.writeObject(cars.size());
             int i=0;
             while(i<cars.size())
@@ -385,7 +377,7 @@ public class Habitat extends JPanel {
                 i++;
             }
             f.close();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("XML file saved.");
