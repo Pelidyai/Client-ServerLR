@@ -2,6 +2,10 @@ package Main;
 
 import Server.DatagramServer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class Client {
@@ -46,11 +50,15 @@ public class Client {
     public static void addToServer(ArrayList<Car> cars, int index) {
         if (client != null) {
             try {
-                //ObjectOutputStream f = new ObjectOutputStream(new BufferedOutputStream(os));
                 if (index == -2) {
                     client.SendString("add");
-                    //f.writeObject(cars);
-                    //f.flush();
+                    while(client.isSending()) Thread.sleep(1);
+                    Thread.sleep(5);
+                    ByteArrayOutputStream b_out = new ByteArrayOutputStream();
+                    ObjectOutputStream o_out = new ObjectOutputStream(b_out);
+                    o_out.writeObject(cars);
+                    client.SendBytes(b_out.toByteArray(), b_out.size());
+                    while(client.isSending())Thread.sleep(1);
                 } else {
                     if (0 <= index && index < cars.size()) {
                         client.SendString("addOne");
@@ -71,8 +79,12 @@ public class Client {
         if (client != null) {
             try {
                 client.SendString("getVec");
-                //ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(is));
-                //cars = (ArrayList<Car>) f.readObject();
+                while(client.isSending()) Thread.sleep(1);
+                Thread.sleep(5);
+                while(client.receivedCount() == 0) Thread.sleep(1);
+                ByteArrayInputStream b_in = new ByteArrayInputStream(client.pullBytes());
+                ObjectInputStream o_in = new ObjectInputStream(b_in);
+                cars = (ArrayList<Car>) o_in.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -25,8 +25,7 @@ public class Server {
         while (true) {
             try {
                 System.out.println("Listening");
-                while(server.receiveByteArray.size() == 0) Thread.sleep(1);
-                System.out.println("Received");
+                while(server.receivedCount() == 0) Thread.sleep(1);
                 String command = server.pullString();
                 System.out.println("Command on server: " + command);
                 if (command == null)
@@ -53,18 +52,10 @@ public class Server {
                     case "add": {
                         System.out.println("Add vector.");
                         System.out.println("Vector size before operation: " + cars.size() + ".");
-                        /*ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(serverInput));
-
-                        try {
-                            try {
-
-                                cars = (ArrayList<Car>) f.readObject();
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }*/
+                        while(server.receivedCount() == 0) Thread.sleep(1);
+                        ByteArrayInputStream b_in = new ByteArrayInputStream(server.pullBytes());
+                        ObjectInputStream o_in = new ObjectInputStream(b_in);
+                        cars = (ArrayList<Car>) o_in.readObject();
                         System.out.println("Vector size after operation: " + cars.size() + ".");
                         break;
                     }
@@ -95,10 +86,12 @@ public class Server {
                     }
                     case "getVec": {
                         try {
-                            System.out.println("Send Vector.");
-                            /*ObjectOutputStream f = new ObjectOutputStream(new BufferedOutputStream(serverOutput));
-                            f.writeObject(cars);
-                            f.flush();*/
+                            System.out.printf("Send Vector. Size %d\n", cars.size());
+                            ByteArrayOutputStream b_out = new ByteArrayOutputStream();
+                            ObjectOutputStream o_out = new ObjectOutputStream(b_out);
+                            o_out.writeObject(cars);
+                            server.SendBytes(b_out.toByteArray(), b_out.size());
+                            while(server.isSending())Thread.sleep(1);
                             System.out.println("OK.");
                         } catch (Exception e) {
                             e.printStackTrace();

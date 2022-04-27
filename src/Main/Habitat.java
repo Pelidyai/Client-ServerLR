@@ -148,6 +148,7 @@ public class Habitat extends JPanel {
                     case ';':{
                         System.out.println(h.cars.size());
                         ArrayList<Car> buf = Client.getVecFromServer();
+                        System.out.println(buf.size());
                         h.cars.clear();
                         h.cars.addAll(0, buf);
                         Car.Im = new Image[16];

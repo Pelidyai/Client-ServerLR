@@ -35,10 +35,8 @@ public class DatagramServer {
         isStart = true;
         SocketListener sl = new SocketListener();
         SocketSendTimer sst = new SocketSendTimer();
-        SocketReceiveProcessTimer srpt = new SocketReceiveProcessTimer();
         sl.start();
         sst.start();
-        srpt.start();
     }
 
     public void stop(){
@@ -48,6 +46,8 @@ public class DatagramServer {
     }
 
     private class SocketListener extends Thread{
+        ArrayList<DatagramPacketClass> buf = new ArrayList<>();
+        int lastSeq = 0;
         @Override
         public void run() {
             super.run();
@@ -61,79 +61,74 @@ public class DatagramServer {
                         sendMap.remove(dpc.seq);
                     }
                     else if(dpc.isValidCheckSum()){
-                        receiveDatagramMap.put(dpc.seq, new DatagramPacketClass(dpc));
+                        if(!receiveDatagramMap.containsKey(dpc.seq))
+                            receiveDatagramMap.put(dpc.seq, new DatagramPacketClass(dpc));
                         dpc.dataLength = 0;
                         dpc.length = headerSize;
                         ds.send(new DatagramPacket(dpc.toBytes(), dpc.length, InetAddress.getLocalHost(), clientPort));
+                        checkSequence();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-    }
 
-    private class SocketReceiveProcessTimer extends Thread{
-        ArrayList<DatagramPacketClass> buf = new ArrayList<>();
-        boolean initFlag = false;
-        int lastSeq = 0;
-        private void PacketProcessing(){
-            if(buf.isEmpty()) return;
-            ByteBuffer res = ByteBuffer.allocate((MTU - headerSize) * (buf.size() - 1) + buf.get(buf.size() - 1).dataLength);
-            for(int i = 0; i < buf.size(); i++){
-                receiveDatagramMap.remove(buf.get(i).seq);
-                res.put(buf.get(i).data);
+        void checkSequence(){
+            boolean initFlag = false;
+            Map<Integer, DatagramPacketClass> map_buf;
+            try {
+                map_buf = new TreeMap<>(receiveDatagramMap);
             }
-            System.out.println("r " + new String(res.array()) + " - " + Integer.toString(res.array().length) + " - " + Integer.toString(buf.size()));
-            receiveByteArray.add(res.array());
-        }
-        @Override
-        public void run() {
-            super.run();
-            while(!isStop){
-                Map<Integer, DatagramPacketClass> map_buf = new TreeMap<>(receiveDatagramMap);
-                for (Map.Entry<Integer, DatagramPacketClass> obj : map_buf.entrySet()) {
-                    DatagramPacketClass dpc = obj.getValue();
-                    if(dpc.Mbyte == (byte)0 && initFlag){
-                        if(lastSeq + 1 == dpc.seq){
-                            buf.add(dpc);
-                            PacketProcessing();
-                        }
-                        else{
-                            initFlag = false;
-                        }
+            catch(ConcurrentModificationException e){
+                checkSequence();
+                return;
+            }
+            for (Map.Entry<Integer, DatagramPacketClass> obj : map_buf.entrySet()) {
+                DatagramPacketClass dpc = obj.getValue();
+                if(dpc.Mbyte == (byte)0 && initFlag){
+                    if(dpc.Ibyte == (byte)1)
                         buf.clear();
-                        continue;
-                    }
-                    if(dpc.Ibyte == (byte)1){
-                        buf.clear();
-                        buf.add(dpc);
-                        if(dpc.Mbyte == (byte)0) {
-                            PacketProcessing();
-                            buf.clear();
-                        }
-                        else {
-                            initFlag = true;
-                            lastSeq = dpc.seq;
-                        }
-                        continue;
-                    }
-                    if(initFlag && lastSeq + 1 == dpc.seq){
-                        lastSeq = dpc.seq;
-                        buf.add(dpc);
-                    }
-                    else if(initFlag){
+                    buf.add(dpc);
+                    PacketProcessing();
+                    initFlag = false;
+                    buf.clear();
+                    continue;
+                }
+                if(dpc.Ibyte == (byte)1){
+                    buf.clear();
+                    buf.add(dpc);
+                    if(dpc.Mbyte == (byte)0) {
+                        PacketProcessing();
                         initFlag = false;
                         buf.clear();
                     }
+                    else {
+                        initFlag = true;
+                        lastSeq = dpc.seq;
+                    }
+                    continue;
                 }
-                try {
-                    Thread.sleep(100);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(initFlag && lastSeq + 1 == dpc.seq){
+                    lastSeq = dpc.seq;
+                    buf.add(dpc);
                 }
-
+                else if(initFlag){
+                    initFlag = false;
+                    buf.clear();
+                }
             }
+        }
+
+        void PacketProcessing(){
+            if(buf.isEmpty()) return;
+            ByteBuffer res = ByteBuffer.allocate((MTU - headerSize) * (buf.size() - 1) + buf.get(buf.size() - 1).dataLength);
+            for (DatagramPacketClass dpc : buf) {
+                res.put(dpc.data);
+            }
+            receiveDatagramMap.get(buf.get(buf.size() - 1).seq).Mbyte = (byte)1;
+            receiveDatagramMap.get(buf.get(buf.size() - 1).seq).Ibyte = (byte)0;
+            receiveByteArray.add(res.array());
         }
     }
 
@@ -152,7 +147,7 @@ public class DatagramServer {
                     }
                 }
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -183,7 +178,6 @@ public class DatagramServer {
             }
             seq++;
         }
-        System.out.println("s " + new String(Arrays.copyOfRange(packet,0,len)) + " - " + Integer.toString(len) + " - " + Integer.toString(packetCount));
     }
 
     public void SendString(String str){
