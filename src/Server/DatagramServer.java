@@ -87,10 +87,14 @@ public class DatagramServer {
             for (Map.Entry<Integer, DatagramPacketClass> obj : map_buf.entrySet()) {
                 DatagramPacketClass dpc = obj.getValue();
                 if(dpc.Mbyte == (byte)0 && initFlag){
-                    if(dpc.Ibyte == (byte)1)
+                    if(dpc.Ibyte == (byte)1) {
                         buf.clear();
-                    buf.add(dpc);
-                    PacketProcessing();
+                        buf.add(dpc);
+                        PacketProcessing();
+                    } else if (lastSeq + 1 == dpc.seq){
+                        buf.add(dpc);
+                        PacketProcessing();
+                    }
                     initFlag = false;
                     buf.clear();
                     continue;
@@ -124,10 +128,9 @@ public class DatagramServer {
             if(buf.isEmpty()) return;
             ByteBuffer res = ByteBuffer.allocate((MTU - headerSize) * (buf.size() - 1) + buf.get(buf.size() - 1).dataLength);
             for (DatagramPacketClass dpc : buf) {
+                receiveDatagramMap.remove(dpc.seq);
                 res.put(dpc.data);
             }
-            receiveDatagramMap.get(buf.get(buf.size() - 1).seq).Mbyte = (byte)1;
-            receiveDatagramMap.get(buf.get(buf.size() - 1).seq).Ibyte = (byte)0;
             receiveByteArray.add(res.array());
         }
     }
@@ -156,7 +159,7 @@ public class DatagramServer {
         }
     }
 
-    public void SendBytes(byte[] packet, int len){
+    public void SendBytes(byte[] packet, int len, boolean wait) throws InterruptedException {
         int packetCount = (len - 1) / (MTU - headerSize) + 1;
         int seq = new Random(Instant.now().get(ChronoField.MICRO_OF_SECOND)).nextInt();
         for(int i = 0; i < packetCount; i++) {
@@ -178,10 +181,13 @@ public class DatagramServer {
             }
             seq++;
         }
+        while(isSending() && wait){
+            Thread.sleep(1);
+        }
     }
 
-    public void SendString(String str){
-        SendBytes(str.getBytes(), str.length());
+    public void SendString(String str, boolean wait) throws InterruptedException {
+        SendBytes(str.getBytes(), str.length(), wait);
     }
 
     public String pullString(){
@@ -196,6 +202,16 @@ public class DatagramServer {
         byte[] bytes = receiveByteArray.get(0);
         receiveByteArray.remove(0);
         return bytes;
+    }
+
+    public boolean waitReceive(int wait) throws InterruptedException {
+        int i = 0;
+        while (receivedCount() == 0 && (i < wait || wait < 0)) {
+            Thread.sleep(1);
+            i++;
+        }
+        if(i == wait) return false;
+        return true;
     }
 
     public boolean isSending(){

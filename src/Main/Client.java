@@ -23,7 +23,7 @@ public class Client {
     public static void clearVec() {
         if (client != null) {
             try {
-                client.SendString("clear");
+                client.SendString("clear", true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -35,9 +35,9 @@ public class Client {
     public static int getVecSize() {
         if (client != null) {
             try {
-                client.SendString("size");
-                //int size = br.read();
-                return 0;
+                client.SendString("size", true);
+                if(!client.waitReceive(500)) return 0;
+                return Integer.parseInt(client.pullString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -51,19 +51,19 @@ public class Client {
         if (client != null) {
             try {
                 if (index == -2) {
-                    client.SendString("add");
-                    while(client.isSending()) Thread.sleep(1);
-                    Thread.sleep(5);
+                    client.SendString("add", true);
                     ByteArrayOutputStream b_out = new ByteArrayOutputStream();
                     ObjectOutputStream o_out = new ObjectOutputStream(b_out);
                     o_out.writeObject(cars);
-                    client.SendBytes(b_out.toByteArray(), b_out.size());
-                    while(client.isSending())Thread.sleep(1);
+                    client.SendBytes(b_out.toByteArray(), b_out.size(), true);
                 } else {
                     if (0 <= index && index < cars.size()) {
-                        client.SendString("addOne");
-                        //cars.get(index).Serialize(f);
-                        //f.flush();
+                        client.SendString("addOne", true);
+                        client.SendString(Integer.toString(index), true);
+                        ByteArrayOutputStream b_out = new ByteArrayOutputStream();
+                        ObjectOutputStream o_out = new ObjectOutputStream(b_out);
+                        cars.get(index).Serialize(o_out);
+                        client.SendBytes(b_out.toByteArray(), b_out.size(), true);
                     }
                 }
             } catch (Exception e) {
@@ -78,13 +78,13 @@ public class Client {
         ArrayList<Car> cars = null;
         if (client != null) {
             try {
-                client.SendString("getVec");
-                while(client.isSending()) Thread.sleep(1);
-                Thread.sleep(5);
-                while(client.receivedCount() == 0) Thread.sleep(1);
+                client.SendString("getVec", true);
+                if(!client.waitReceive(500)) return null;
                 ByteArrayInputStream b_in = new ByteArrayInputStream(client.pullBytes());
-                ObjectInputStream o_in = new ObjectInputStream(b_in);
-                cars = (ArrayList<Car>) o_in.readObject();
+                if(b_in.available() != 0) {
+                    ObjectInputStream o_in = new ObjectInputStream(b_in);
+                    cars = (ArrayList<Car>) o_in.readObject();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -98,10 +98,14 @@ public class Client {
         Car car = null;
         if (client != null) {
             try {
-                client.SendString("getOne");
-                client.SendString(Integer.toString(index));
-                //ObjectInputStream f = new ObjectInputStream(new BufferedInputStream(is));
-                //car = (Car) f.readObject();
+                client.SendString("getOne", true);
+                client.SendString(Integer.toString(index), true);
+                if(!client.waitReceive(500)) return null;
+                ByteArrayInputStream b_in = new ByteArrayInputStream(client.pullBytes());
+                if(b_in.available() != 0) {
+                    ObjectInputStream f = new ObjectInputStream(b_in);
+                    car = (Car) f.readObject();
+                }
                 System.out.println("Object received.");
             } catch (Exception e) {
                 e.printStackTrace();

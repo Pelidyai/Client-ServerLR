@@ -1,5 +1,7 @@
 package Main;
 
+import Server.Server;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -142,7 +144,8 @@ public class Habitat extends JPanel {
                     }
                     case '\'':{
                         Random rand = new Random();
-                        Client.addToServer(h.cars, rand.nextInt()%h.cars.size());
+                        int ind = Math.abs(rand.nextInt())%h.cars.size();
+                        Client.addToServer(h.cars, ind);
                         break;
                     }
                     case ';':{
@@ -159,13 +162,13 @@ public class Habitat extends JPanel {
                     }
                     case 'l': {
                         Random rand = new Random();
-                        Car buf = Client.getOneFromServer(rand.nextInt() % 2);
+                        int len = Client.getVecSize();
+                        int ind = Math.abs(rand.nextInt())%len;
+                        Car buf = Client.getOneFromServer(ind);
                         if (buf != null)
                             h.cars.add(buf);
                     }
-
                 }
-
             }
 
             @Override
